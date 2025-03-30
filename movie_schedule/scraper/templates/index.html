@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>映画スケジュール検索（TOHO限定）</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input, button { padding: 10px; margin-top: 10px; }
+        .results { margin-top: 20px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>映画スケジュール検索（TOHO限定）</h1>
+    <form id="movie-form">
+        <label for="movie-title">映画タイトルを入力してください:</label>
+        <input type="text" id="movie-title" name="title" required>
+        <button type="submit">検索</button>
+    </form>
+
+    <div class="results" id="results"></div>
+
+    <script>
+        document.getElementById("movie-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const movieTitle = document.getElementById("movie-title").value.trim();
+            if (!movieTitle) return;
+            
+            fetch("/get_movie_schedule/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ title: movieTitle }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById("results");
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p class="error">${data.error}</p>`;
+                } else {
+                    let scheduleHtml = "<h2>上映スケジュール（TOHO限定）</h2>";
+                    for (const theater in data) {
+                        scheduleHtml += `<p><strong>${theater}</strong><br>${data[theater].join("<br>")}</p>`;
+                    }
+                    resultsDiv.innerHTML = scheduleHtml;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("results").innerHTML = `<p class="error">エラーが発生しました。再試行してください。</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
