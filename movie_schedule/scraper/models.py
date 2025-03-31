@@ -10,10 +10,12 @@ class Theater(models.Model):
     
 class Movie(models.Model):
     title = models.CharField(max_length=255)
-    theater = models.ForeignKey(Theater, on_delete=models.CASCADE)  
-    start_time = models.TimeField() 
-    end_time = models.TimeField()
-    created_at = models.DateTimeField(auto_now_add=True) 
+    theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
+    date = models.DateField()  # 日付
+    start_time = models.TimeField()  # 開始時刻
+    end_time = models.TimeField()  # 終了時刻
 
-    def __str__(self):
-        return f"{self.title} ({self.theater.name}) - {self.start_time} ～ {self.end_time}"
+    def save(self, *args, **kwargs):
+        if not self.date:
+            self.date = self.start_time.date()  # start_time から date を自動設定
+        super().save(*args, **kwargs)
