@@ -16,10 +16,84 @@ from selenium.webdriver.support.ui import WebDriverWait
 from bs4 import BeautifulSoup
 from .models import Theater, Movie
 
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'movie_schedule.settings')
+django.setup()
+
 # スクレイピング対象のURL
 URLS = {
-    "TOHO川崎": 'https://hlo.tohotheater.jp/net/schedule/010/TNPI2000J01.do',
-    "TOHOららぽーと横浜": 'https://hlo.tohotheater.jp/net/schedule/036/TNPI2000J01.do'
+  "TOHOシネマズ すすきの": "https://hlo.tohotheater.jp/net/schedule/089/TNPI2000J01.do",
+  "TOHOシネマズ おいらせ下田": "https://hlo.tohotheater.jp/net/schedule/049/TNPI2000J01.do",
+  "TOHOシネマズ 秋田": "https://hlo.tohotheater.jp/net/schedule/050/TNPI2000J01.do",
+  "TOHOシネマズ 仙台": "https://hlo.tohotheater.jp/net/schedule/078/TNPI2000J01.do",
+  "TOHOシネマズ 日比谷": "https://hlo.tohotheater.jp/net/schedule/081/TNPI2000J01.do",
+  "TOHOシネマズ 新宿": "https://hlo.tohotheater.jp/net/schedule/076/TNPI2000J01.do",
+  "TOHOシネマズ 池袋": "https://hlo.tohotheater.jp/net/schedule/084/TNPI2000J01.do",
+  "TOHOシネマズ 日本橋": "https://hlo.tohotheater.jp/net/schedule/073/TNPI2000J01.do",
+  "TOHOシネマズ 上野": "https://hlo.tohotheater.jp/net/schedule/080/TNPI2000J01.do",
+  "TOHOシネマズ 六本木ヒルズ": "https://hlo.tohotheater.jp/net/schedule/009/TNPI2000J01.do",
+  "TOHOシネマズ 渋谷": "https://hlo.tohotheater.jp/net/schedule/043/TNPI2000J01.do",
+  "TOHOシネマズ 西新井": "https://hlo.tohotheater.jp/net/schedule/040/TNPI2000J01.do",
+  "TOHOシネマズ 南大沢": "https://hlo.tohotheater.jp/net/schedule/006/TNPI2000J01.do",
+  "TOHOシネマズ 府中": "https://hlo.tohotheater.jp/net/schedule/012/TNPI2000J01.do",
+  "TOHOシネマズ 立川立飛": "https://hlo.tohotheater.jp/net/schedule/085/TNPI2000J01.do",
+  "TOHOシネマズ 錦糸町（楽天地・オリナス）": "https://hlo.tohotheater.jp/net/schedule/029/TNPI2000J01.do",
+  "TOHOシネマズ ららぽーと船橋": "https://hlo.tohotheater.jp/net/schedule/018/TNPI2000J01.do",
+  "TOHOシネマズ 市川コルトンプラザ": "https://hlo.tohotheater.jp/net/schedule/003/TNPI2000J01.do",
+  "TOHOシネマズ 柏": "https://hlo.tohotheater.jp/net/schedule/077/TNPI2000J01.do",
+  "TOHOシネマズ 八千代緑が丘": "https://hlo.tohotheater.jp/net/schedule/028/TNPI2000J01.do",
+  "TOHOシネマズ 流山おおたかの森": "https://hlo.tohotheater.jp/net/schedule/035/TNPI2000J01.do",
+  "TOHOシネマズ 市原": "https://hlo.tohotheater.jp/net/schedule/071/TNPI2000J01.do",
+  "TOHOシネマズ 海老名": "https://hlo.tohotheater.jp/net/schedule/007/TNPI2000J01.do",
+  "TOHOシネマズ 小田原": "https://hlo.tohotheater.jp/net/schedule/008/TNPI2000J01.do",
+  "TOHOシネマズ 川崎": "https://hlo.tohotheater.jp/net/schedule/010/TNPI2000J01.do",
+  "TOHOシネマズ ららぽーと横浜": "https://hlo.tohotheater.jp/net/schedule/036/TNPI2000J01.do",
+  "TOHOシネマズ 上大岡": "https://hlo.tohotheater.jp/net/schedule/066/TNPI2000J01.do",
+  "TOHOシネマズ ららぽーと富士見": "https://hlo.tohotheater.jp/net/schedule/075/TNPI2000J01.do",
+  "TOHOシネマズ 宇都宮": "https://hlo.tohotheater.jp/net/schedule/015/TNPI2000J01.do",
+  "TOHOシネマズ ひたちなか": "https://hlo.tohotheater.jp/net/schedule/024/TNPI2000J01.do",
+  "TOHOシネマズ 水戸内原": "https://hlo.tohotheater.jp/net/schedule/025/TNPI2000J01.do",
+  "TOHOシネマズ 甲府": "https://hlo.tohotheater.jp/net/schedule/067/TNPI2000J01.do",
+  "TOHOシネマズ 赤池": "https://hlo.tohotheater.jp/net/schedule/079/TNPI2000J01.do",
+  "TOHOシネマズ 津島": "https://hlo.tohotheater.jp/net/schedule/026/TNPI2000J01.do",
+  "TOHOシネマズ 東浦": "https://hlo.tohotheater.jp/net/schedule/021/TNPI2000J01.do",
+  "TOHOシネマズ 木曽川": "https://hlo.tohotheater.jp/net/schedule/016/TNPI2000J01.do",
+  "TOHOシネマズ 浜松": "https://hlo.tohotheater.jp/net/schedule/004/TNPI2000J01.do",
+  "TOHOシネマズ サンストリート浜北": "https://hlo.tohotheater.jp/net/schedule/039/TNPI2000J01.do",
+  "TOHOシネマズ ららぽーと磐田": "https://hlo.tohotheater.jp/net/schedule/065/TNPI2000J01.do",
+  "TOHOシネマズ 岐阜": "https://hlo.tohotheater.jp/net/schedule/020/TNPI2000J01.do",
+  "TOHOシネマズ モレラ岐阜": "https://hlo.tohotheater.jp/net/schedule/030/TNPI2000J01.do",
+  "TOHOシネマズ ファボーレ富山": "https://hlo.tohotheater.jp/net/schedule/053/TNPI2000J01.do",
+  "TOHOシネマズ 高岡": "https://hlo.tohotheater.jp/net/schedule/054/TNPI2000J01.do",
+  "TOHOシネマズ 上田": "https://hlo.tohotheater.jp/net/schedule/068/TNPI2000J01.do",
+  "TOHOシネマズ 梅田": "https://hlo.tohotheater.jp/net/schedule/037/TNPI2000J01.do",
+  "TOHOシネマズ なんば（本館・別館）": "https://hlo.tohotheater.jp/net/schedule/032/TNPI2000J01.do",
+  "TOHOシネマズ 泉北": "https://hlo.tohotheater.jp/net/schedule/005/TNPI2000J01.do",
+  "TOHOシネマズ 鳳": "https://hlo.tohotheater.jp/net/schedule/045/TNPI2000J01.do",
+  "TOHOシネマズ くずはモール": "https://hlo.tohotheater.jp/net/schedule/072/TNPI2000J01.do",
+  "TOHOシネマズ セブンパーク天美": "https://hlo.tohotheater.jp/net/schedule/086/TNPI2000J01.do",
+  "TOHOシネマズ ららぽーと門真": "https://hlo.tohotheater.jp/net/schedule/088/TNPI2000J01.do",
+  "TOHOシネマズ 二条": "https://hlo.tohotheater.jp/net/schedule/023/TNPI2000J01.do",
+  "TOHOシネマズ 西宮OS": "https://hlo.tohotheater.jp/net/schedule/064/TNPI2000J01.do",
+  "TOHOシネマズ 伊丹": "https://hlo.tohotheater.jp/net/schedule/038/TNPI2000J01.do",
+  "TOHOシネマズ 橿原": "https://hlo.tohotheater.jp/net/schedule/013/TNPI2000J01.do",
+  "TOHOシネマズ 岡南": "https://hlo.tohotheater.jp/net/schedule/031/TNPI2000J01.do",
+  "TOHOシネマズ 緑井": "https://hlo.tohotheater.jp/net/schedule/019/TNPI2000J01.do",
+  "TOHOシネマズ 高知": "https://hlo.tohotheater.jp/net/schedule/017/TNPI2000J01.do",
+  "TOHOシネマズ 新居浜": "https://hlo.tohotheater.jp/net/schedule/048/TNPI2000J01.do",
+  "TOHOシネマズ ららぽーと福岡": "https://hlo.tohotheater.jp/net/schedule/087/TNPI2000J01.do",
+  "TOHOシネマズ 天神・ソラリア館": "https://hlo.tohotheater.jp/net/schedule/056/TNPI2000J01.do",
+  "TOHOシネマズ 福津": "https://hlo.tohotheater.jp/net/schedule/069/TNPI2000J01.do",
+  "TOHOシネマズ 直方": "https://hlo.tohotheater.jp/net/schedule/022/TNPI2000J01.do",
+  "TOHOシネマズ 長崎": "https://hlo.tohotheater.jp/net/schedule/046/TNPI2000J01.do",
+  "TOHOシネマズ 熊本サクラマチ": "https://hlo.tohotheater.jp/net/schedule/083/TNPI2000J01.do",
+  "TOHOシネマズ 光の森": "https://hlo.tohotheater.jp/net/schedule/014/TNPI2000J01.do",
+  "TOHOシネマズ はません": "https://hlo.tohotheater.jp/net/schedule/027/TNPI2000J01.do",
+  "TOHOシネマズ 宇城": "https://hlo.tohotheater.jp/net/schedule/057/TNPI2000J01.do",
+  "TOHOシネマズ 大分わさだ": "https://hlo.tohotheater.jp/net/schedule/055/TNPI2000J01.do",
+  "TOHOシネマズ アミュプラザおおいた": "https://hlo.tohotheater.jp/net/schedule/074/TNPI2000J01.do",
+  "TOHOシネマズ 与次郎": "https://hlo.tohotheater.jp/net/schedule/033/TNPI2000J01.do",
 }
 
 def convert_time(time_str, base_date):
@@ -41,8 +115,9 @@ def toho_fetch_and_store_movie_schedules():
     """映画スケジュールを取得し、データベースに保存"""
     service = ChoromeService(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service)
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(1)
 
+    # 古いデータ（1週間より前のデータ）を削除
     threshold_date = datetime.today().date() - timedelta(days=7)
     Movie.objects.filter(date__lt=threshold_date).delete()
 
@@ -53,42 +128,55 @@ def toho_fetch_and_store_movie_schedules():
             print(f"【エラー】劇場IDがURLから取得できません: {url}")
             continue
         theater_id = match.group(1)
-        theater, _ = Theater.objects.get_or_create(id_number=theater_id, name=theater_name)
+        theater, _ = Theater.objects.update_or_create(id_number=theater_id, name=theater_name)
 
         driver.get(url)
         time.sleep(2)
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-        today = datetime.today().date()
-        base_date = today
+        for day_offset in range(7 + 1):  # 今日を含む7日間
+            base_date = datetime.today().date() + timedelta(days=day_offset)
 
-        movie_sections = soup.find_all('div', class_='schedule-body-section-item')
-        for section in movie_sections:
-            title_element = section.find('h5', class_='schedule-body-title')
-            if title_element:
-                movie_title = title_element.text.strip()
-                start_times = section.find_all('span', class_='start')
-                end_times = section.find_all('span', class_='end')
+            if day_offset != 0:
+                # ▼▼ 日付変更のブラウザ操作コード ▼▼
+                target_date_id = base_date.strftime("%Y%m%d")
+                try:
+                    tab = driver.find_element(By.ID, target_date_id)
+                    driver.execute_script("arguments[0].click();", tab)
+                    time.sleep(2)  # ページ切り替えの待機
+                except Exception as e:
+                    print(f"【スキップ】日付 {target_date_id} のタブが見つかりません: {e}")
+                    continue
 
-                for start, end in zip(start_times, end_times):
-                    start_text = start.text.strip()
-                    end_text = end.text.strip()
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            movie_sections = soup.find_all('div', class_='schedule-body-section-item')
 
-                    start_datetime = convert_time(start_text, base_date)
-                    end_datetime = convert_time(end_text, base_date)
+            for section in movie_sections:
+                title_element = section.find('h5', class_='schedule-body-title')
+                if title_element:
+                    movie_title = title_element.text.strip()
+                    start_times = section.find_all('span', class_='start')
+                    end_times = section.find_all('span', class_='end')
 
-                    if start_datetime and end_datetime:
-                        Movie.objects.get_or_create(
-                            title=movie_title,
-                            theater=theater,
-                            date=start_datetime.date(),  # 日付部分を保存
-                            start_time=start_datetime.time(),  # 時刻部分を保存
-                            end_time=end_datetime.time(),  # 時刻部分を保存
-                        )
-                    else:
-                        print(f"【スキップ】不正な時刻データ: {start_text}, {end_text}")
+                    for start, end in zip(start_times, end_times):
+                        start_text = start.text.strip()
+                        end_text = end.text.strip()
+
+                        start_datetime = convert_time(start_text, base_date)
+                        end_datetime = convert_time(end_text, base_date)
+
+                        if start_datetime and end_datetime:
+                            Movie.objects.get_or_create(
+                                title=movie_title,
+                                theater=theater,
+                                date=start_datetime.date(),
+                                start_time=start_datetime.time(),
+                                end_time=end_datetime.time(),
+                            )
+                        else:
+                            print(f"【スキップ】不正な時刻データ: {start_text}, {end_text}")
 
     driver.quit()
+
 
 #109のデータを取得・保存
 def loq_fetch_and_store_movie_scadules():
@@ -107,7 +195,7 @@ def loq_fetch_and_store_movie_scadules():
     soup = BeautifulSoup(html, 'html.parser')
     today = datetime.today().date()
 
-    theater, _ = Theater.objects.get_or_create(name="109シネマズ川崎")
+    theater, _ = Theater.objects.update_or_create(name="109シネマズ川崎")
 
     for article in soup.find_all('article'):
         title_element = article.find('h2')
@@ -152,15 +240,24 @@ def get_movie_schedule(request):
     if request.method == "POST":
         data = json.loads(request.body)
         movie_title = data.get("title", "").strip()
+        date_str = data.get("date","").strip()
 
         if not movie_title:
             return JsonResponse({"error": "映画タイトルを入力してください"}, status=400)
+        try:
+            selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return JsonResponse({"error": "日付の形式が不正です。"}, status=400)
         
         schedule = {}
         theaters = Theater.objects.all()
 
         for theater in theaters:
-            movies = Movie.objects.filter(title__icontains=movie_title, theater=theater)
+            movies = Movie.objects.filter(
+                title__icontains=movie_title,
+                theater=theater,
+                date = selected_date,
+                )
 
             if movies:
                 theater_schedule = []
